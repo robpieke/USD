@@ -1163,6 +1163,19 @@ def InstallTBB_Linux(context, force, buildArgs):
         CopyDirectory(context, "include/serial", "include/serial")
         CopyDirectory(context, "include/tbb", "include/tbb")
 
+        # Generate TBBConfig.cmake to satisfy the call to
+        # `find_package(TBB CONFIG)` in `cmake/defaults/Packages.cmake`
+        makeTBBConfigCmd = ' '.join([
+            'cmake',
+            '-DINSTALL_DIR={}'.format(context.instDir+'/lib/cmake/TBB'),
+            '-DSYSTEM_NAME={}'.format('Linux'),
+            '-DTBB_VERSION_FILE={}'.format('include/tbb/tbb_stddef.h'),
+            '-DINC_REL_PATH={}'.format('../../../include'),
+            '-DLIB_REL_PATH={}'.format('../../../lib'),
+            '-DBIN_REL_PATH={}'.format('../../../bin'),
+            '-P cmake/tbb_config_installer.cmake'])
+        Run(makeTBBConfigCmd)
+
 TBB = Dependency("TBB", InstallTBB, "include/tbb/tbb.h")
 
 ############################################################
